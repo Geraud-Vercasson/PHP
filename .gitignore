@@ -2,7 +2,7 @@ Tests/
 wamplangues/
 wampthemes/
 add_vhost.php
-*.ico
+favicon.ico
 index.php
 test_sockets.php
 testmysql.php
