@@ -1,1 +1,8 @@
-*.php
+Tests/
+wamplagues/
+wampthemes/
+add_vhost.php
+*.ico
+index.php
+test_sockets.php
+testmysql.php
