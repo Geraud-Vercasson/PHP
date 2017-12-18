@@ -4,7 +4,6 @@
 <body>
     
 <?php
-
 $date = date("D j M H:i:s");
 $cafe = "Café";
 $cappuccino = "Cappuccino";
@@ -22,4 +21,15 @@ print("<p> Date du serveur : ".$date."</p>");
 
 ?>
 
+<form action="preparerBoisson.php" method="POST">
+    <p><label for="boisson"> Boisson : </label>
+    <input type="radio" name="boisson" value="Café">Café <br>
+    <input type="radio" name="boisson" value="Cappuccino">Cappuccino <br>
+    <input type="radio" name="boisson" value="Chocolat">Chocolat <br>
+    <input type="radio" name="boisson" value="Thé">Thé <br>
+    <label for="sucres">Nombre de sucres : </label>
+    <br>
+    <input type="number" name="sucres" value = 0 >
+    <input type="submit" value="Commander !"></input>
+</form>
 </body>
