@@ -1,16 +1,40 @@
 <?php
 
-$GLOBALS['recettes'] = array('café' => array('eau' => 2, 'café' => 2), 'cappuccino' => array('eau' => 2, 'café' => 2, 'lait' => 1),
-                    'chocolat' => array('lait' => 3, 'cacao' => 2), 'thé' => array('eau' => 3, 'thé' => 1));
+$GLOBALS['recettes'] = array('café' => array('eau' => 2, 'café' => 2),
+                            'cappuccino' => array('eau' => 2, 'café' => 2, 'lait' => 1),
+                            'chocolat' => array('lait' => 3, 'cacao' => 2), 
+                            'thé' => array('eau' => 3, 'thé' => 1));
 
-function prepare($recetteArray){
+if (empty($_POST['stock'])){
+    initStock(10,10,10,10,10,30);
+} else {
+    $stock = explode('|',$_POST['stock']);
+        initStock($stock[0],$stock[1],$stock[2],$stock[3],$stock[4],$stock[5]);
+}
+
+
+function prepare($recetteArray, $sucres){
 
     $recette = "";
 
     foreach ($recetteArray as $recetteKey => $recetteValue) {
-        $recette = $recette.$recetteValue.' * '.$recetteKey.', ';
-    }
 
+        if (isset($GLOBALS['stock'][$recetteKey]) && $GLOBALS['stock'][$recetteKey] >= $recetteValue){
+
+            $recette = $recette.$recetteValue.' * '.$recetteKey.', ';
+            $GLOBALS['stock'][$recetteKey] -= $recetteValue;
+            
+        } else {
+            return "{$recetteKey} : stock insuffisant";
+        }
+    } 
+    var_dump($GLOBALS['stock']);
+    
+    if ($sucres != 0){
+    
+        $recette = $recette.", {$sucres} * sucres";
+    }
+    
     $recette = rtrim($recette, ", ");
 
     return $recette;
@@ -19,50 +43,26 @@ function prepare($recetteArray){
 
 function prepareCafe($nbSucres){
 
-    $recette = prepare($GLOBALS['recettes']['café']);
+    return prepare($GLOBALS['recettes']['café'],$nbSucres);
 
-    if ($nbSucres != 0){
-
-        $recette = $recette.", {$nbSucres} * sucres";
-    }
-
-    return $recette;
 }
 
 function prepareCappuccino($nbSucres){
 
-    $recette = prepare($GLOBALS['recettes']['cappuccino']);
+    return prepare($GLOBALS['recettes']['cappuccino'],$nbSucres);
     
-    if ($nbSucres != 0){
-
-        $recette = $recette.", {$nbSucres} * sucres";
-    }
-    
-    return $recette;
 }
 
 function prepareChocolat($nbSucres){
     
-    $recette = prepare($GLOBALS['recettes']['chocolat']);
-    
-    if ($nbSucres != 0){
+    return prepare($GLOBALS['recettes']['chocolat'], $nbSucres);
 
-        $recette = $recette.", {$nbSucres} * sucres";
-    }
-    
-    return $recette;
 }
 
 function prepareThe($nbSucres){
     
-    $recette = prepare($GLOBALS['recettes']['thé']);
+    return prepare($GLOBALS['recettes']['thé'], $nbSucres);
 
-    if ($nbSucres != 0){
-
-        $recette = $recette.", {$nbSucres} * sucres";
-    }
-    
-    return $recette;
 }
 
 function preparerBoisson($boisson, $nbSucres){
@@ -82,6 +82,13 @@ function preparerBoisson($boisson, $nbSucres){
             return "Entrée incorrecte";
 
     }
+}
+
+function initStock($eau, $cafe, $lait, $cacao, $the, $sucre){
+
+    $ingredients = array('eau' => $eau, 'café' => $cafe, 'lait' => $lait, 'cacao' => $cacao, 'thé' => $the, 'sucre' => $sucre);
+
+    $GLOBALS['stock'] = $ingredients;
 }
 
 ?>

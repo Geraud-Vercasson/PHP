@@ -10,6 +10,7 @@
 
     include('fonctions.php');
 
+
         $date = date("D j M H:i:s");
         $cafe = "Café";
         $cappuccino = "Cappuccino";
@@ -59,6 +60,7 @@
             <br>
             <input type="number" name="sucres" value = 0 >
             <input id="monnaie" type="hidden" name="monnaie" value="<?php echo $monnaieIntroduite; ?>">
+            <input id="monnaie" type="hidden" name="stock" value="<?php echo implode('|',$GLOBALS['stock']); ?>">
             <input type="submit" value="Commander !"></input>
         </form>
     </body>
