@@ -1,8 +1,25 @@
 <?php
 
+$GLOBALS['recettes'] = array('café' => array('eau' => 2, 'café' => 2), 'cappuccino' => array('eau' => 2, 'café' => 2, 'lait' => 1),
+                    'chocolat' => array('lait' => 3, 'cacao' => 2), 'thé' => array('eau' => 3, 'thé' => 1));
+
+function prepare($recetteArray){
+
+    $recette = "";
+
+    foreach ($recetteArray as $recetteKey => $recetteValue) {
+        $recette = $recette.$recetteValue.' * '.$recetteKey.', ';
+    }
+
+    $recette = rtrim($recette, ", ");
+
+    return $recette;
+
+}
+
 function prepareCafe($nbSucres){
 
-    $recette = "2 * eau, 2 * café";
+    $recette = prepare($GLOBALS['recettes']['café']);
 
     if ($nbSucres != 0){
 
@@ -14,7 +31,7 @@ function prepareCafe($nbSucres){
 
 function prepareCappuccino($nbSucres){
 
-    $recette = "2 * eau, 2 * café, 1 * lait";
+    $recette = prepare($GLOBALS['recettes']['cappuccino']);
     
     if ($nbSucres != 0){
 
@@ -26,7 +43,7 @@ function prepareCappuccino($nbSucres){
 
 function prepareChocolat($nbSucres){
     
-    $recette = "3 * lait, 2 * cacao";
+    $recette = prepare($GLOBALS['recettes']['chocolat']);
     
     if ($nbSucres != 0){
 
@@ -38,7 +55,7 @@ function prepareChocolat($nbSucres){
 
 function prepareThe($nbSucres){
     
-    $recette = "3 * eau, 1 * thé";
+    $recette = prepare($GLOBALS['recettes']['thé']);
 
     if ($nbSucres != 0){
 
