@@ -1,4 +1,8 @@
+<?php
 
+session_start();
+
+?>
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -19,10 +23,10 @@
         $statut = "En attente";
         
         if (isset($_POST['monnaie'])){
-            $monnaieIntroduite = $_POST['monnaie'];
+            $_SESSION['monnaie'] = $_POST['monnaie'];
 
         } else {
-            $monnaieIntroduite = 0;
+            $_SESSION['monnaie'] = 0;
         }
 
         if (isset($_POST['boisson'])){
@@ -30,7 +34,7 @@
         }
 
         echo("Liste des boissons disponibles <ul><li>{$cafe}</li><li>{$cappuccino}</li><li>{$chocolat}</li><li>{$the}</li></ul>");
-        echo("<p id='monnaieIntroduite'> Crédit : ".$monnaieIntroduite." € </p>");
+        echo("<p id='monnaieIntroduite'> Crédit : ". $_SESSION['monnaie']." € </p>");
 
         echo ("<p> {$statut} </p>");
         if (isset($output)){
@@ -59,7 +63,7 @@
             <label for="sucres">Nombre de sucres : </label>
             <br>
             <input type="number" name="sucres" value = 0 >
-            <input id="monnaie" type="hidden" name="monnaie" value="<?php echo $monnaieIntroduite; ?>">
+            <input id="monnaie" type="hidden" name="monnaie" value="<?php echo $_SESSION['monnaie']; ?>">
             <input type="submit" value="Commander !"></input>
         </form>
 
