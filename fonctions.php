@@ -15,25 +15,39 @@ if (empty($_SESSION['stock'])) {
 function prepare($recetteArray, $sucres){
 
     $recette = "";
+    $tableauTempIngredients = [];
 
     foreach ($recetteArray as $recetteKey => $recetteValue) {
 
         if (isset($_SESSION['stock'][$recetteKey]) && $_SESSION['stock'][$recetteKey] >= $recetteValue){
 
             $recette = $recette.$recetteValue.' * '.$recetteKey.', ';
-            $_SESSION['stock'][$recetteKey] -= $recetteValue;
+            $tableauTempIngredients[$recetteKey] = $recetteValue;              //Stock dans un tableau temporaire le singrédients à retirer du stock si la boisson peut être créée
             
         } else {
             return "{$recetteKey} : stock insuffisant";
         }
     } 
-    var_dump($_SESSION['stock']);
+
     
     if ($sucres != 0){
-    
-        $recette = $recette.", {$sucres} * sucres";
+        
+        if ($_SESSION['stock']['sucre'] >= $sucres ) {
+            $recette = $recette." {$sucres} * sucre";
+            if ($sucres > 1) {
+                $recette = $recette."s";
+            }
+            $_SESSION['stock']['sucre'] -= $sucres;
+        } else {
+            return "sucre : stock insuffisant";
+        }
     }
     
+    foreach ($tableauTempIngredients as $key => $value) {   //Tous les ingrédients sont disponibles, on retire la quantité dans le tableau temporaire au stock
+        $_SESSION['stock'][$key] -= $value;
+    }
+
+
     $recette = rtrim($recette, ", ");
 
     return $recette;

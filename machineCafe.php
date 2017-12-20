@@ -62,5 +62,7 @@
             <input id="monnaie" type="hidden" name="monnaie" value="<?php echo $monnaieIntroduite; ?>">
             <input type="submit" value="Commander !"></input>
         </form>
+
+        <a href="ajoutIngredient.php">Maintenance</a>
     </body>
 </html>
