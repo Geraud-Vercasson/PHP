@@ -2,17 +2,18 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+include_once('databaseFunctions.php');
 
-$GLOBALS['recettes'] = array('café' => array('eau' => 2, 'café' => 2),
-                            'cappuccino' => array('eau' => 2, 'café' => 2, 'lait' => 1),
-                            'chocolat' => array('lait' => 3, 'cacao' => 2), 
-                            'thé' => array('eau' => 3, 'thé' => 1));
+foreach(getDrinkList() as $drink) {
 
-$GLOBALS['prix'] = array('café' => 0.5, 'cappuccino' => 0.7, 'chocolat' => 0.7, 'thé' => 0.4);
-
-if (empty($_SESSION['stock'])) {
-    initStock(10,10,10,10,10,30);
+    $GLOBALS['recettes'][$drink] = getRecipe($drink);
+    $GLOBALS['prix'][$drink] = getDrinkPrice($drink);
 }
+
+
+// if (empty($_SESSION['stock'])) {
+//     initStock(10,10,10,10,10,30);
+// }
 
                         
 function prepare($recetteArray, $sucres){
@@ -21,34 +22,34 @@ function prepare($recetteArray, $sucres){
     $tableauTempIngredients = [];
 
 
-    foreach ($recetteArray as $recetteKey => $recetteValue) {
+    foreach ($recetteArray as $recetteIngredient => $recetteValue) {
 
-        if (isset($_SESSION['stock'][$recetteKey]) && $_SESSION['stock'][$recetteKey] >= $recetteValue){
+        if (getStock( $recetteIngredient) >= $recetteValue){
 
-            $recette = $recette.$recetteValue.' * '.$recetteKey.', ';
-            $tableauTempIngredients[$recetteKey] = $recetteValue;              //Stock dans un tableau temporaire le singrédients à retirer du stock si la boisson peut être créée
+            $recette = $recette.$recetteValue.' * '.$recetteIngredient.', ';
+            $tableauTempIngredients[$recetteIngredient] = $recetteValue;              //Stock dans un tableau temporaire le singrédients à retirer du stock si la boisson peut être créée
             
         } else {
-            return "{$recetteKey} : stock insuffisant";
+            return "{$recetteIngredient} : stock insuffisant";
         }
     } 
 
     
     if ($sucres != 0){
         
-        if ($_SESSION['stock']['sucre'] >= $sucres ) {
+        if (getStock('sucre') >= $sucres ) {
             $recette = $recette." {$sucres} * sucre";
             if ($sucres > 1) {
                 $recette = $recette."s";
             }
-            $_SESSION['stock']['sucre'] -= $sucres;
+            removeFromStock($sucres,'sucre');
         } else {
             return "sucre : stock insuffisant";
         }
     }
     
     foreach ($tableauTempIngredients as $key => $value) {   //Tous les ingrédients sont disponibles, on retire la quantité dans le tableau temporaire au stock
-        $_SESSION['stock'][$key] -= $value;
+        removeFromStock($value,$key);
     }
 
 
@@ -85,12 +86,11 @@ function prepareThe($nbSucres){
 
 function preparerBoisson($boisson, $nbSucres){
 
-    $boisson = strtolower($boisson);
-
     if (pay($boisson)){
-
+        
         switch ($boisson){
             case 'café' :
+            echo "boisson : ".$boisson;
                 return prepareCafe($nbSucres);
             case 'thé' :
                 return prepareThe($nbSucres);
@@ -114,11 +114,15 @@ function initStock($eau, $cafe, $lait, $cacao, $the, $sucre){
 }
 
 function pay($boisson){
-    if ($_SESSION['monnaie'] >= $GLOBALS['prix'][$boisson]) {
-        $_SESSION['monnaie'] -= $GLOBALS['prix'][$boisson];
-        return true;
-    }
-    return false;
+    // if ($_SESSION['monnaie'] >= $GLOBALS['prix'][$boisson]) {
+    //     $_SESSION['monnaie'] -= $GLOBALS['prix'][$boisson];
+    //     return true;
+    // }
+    // return false;
+
+    return true;
 }
+
+
 
 ?>

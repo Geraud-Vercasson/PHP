@@ -7,13 +7,16 @@ session_start();
     <head>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="script.js"></script>
+        <meta charset="utf-8">
     </head>
     <body>
         
         <?php
 
         include('fonctions.php');
+        include_once('databaseFunctions.php');
 
+        $boissonsDisponibles = getAvailableDrinks();
 
         $date = date("D j M H:i:s");
         $cafe = "Café";
@@ -30,10 +33,21 @@ session_start();
         }
 
         if (isset($_POST['boisson'])){
+
             $output = preparerBoisson($_POST['boisson'],$_POST['sucres']);
         }
 
-        echo("Liste des boissons disponibles <ul><li>{$cafe}</li><li>{$cappuccino}</li><li>{$chocolat}</li><li>{$the}</li></ul>");
+        if(count($boissonsDisponibles) != 0){
+            echo("Liste des boissons disponibles <ul>");
+
+            foreach($boissonsDisponibles as $boisson){
+    
+                echo "<li>".ucfirst($boisson)."</li>";
+            }
+            echo ("</ul>");
+        } else {
+            echo "Aucune boisson disponible";
+        }
         echo("<p id='monnaieIntroduite'> Crédit : ". $_SESSION['monnaie']." € </p>");
 
         echo ("<p> {$statut} </p>");
@@ -42,6 +56,8 @@ session_start();
         }
 
         print("<p> Date du serveur : ".$date."</p>");
+
+        
 
         ?>
 
@@ -55,14 +71,26 @@ session_start();
         </div>
 
         <form action="machineCafe.php" method="POST">
-            <p><label for="boisson"> Boisson : </label>
-            <input type="radio" name="boisson" value="café">Café <br>
-            <input type="radio" name="boisson" value="cappuccino">Cappuccino <br>
-            <input type="radio" name="boisson" value="chocolat">Chocolat <br>
-            <input type="radio" name="boisson" value="thé">Thé <br>
+            <p><label for="boisson"> Boisson : </label><br>
+        <?php
+
+        foreach(getDrinkList() as $drink){
+            $boutonHTML = "<input type='radio' name='boisson' value='$drink'";
+            
+            if (!in_array($drink,$boissonsDisponibles)){
+                $boutonHTML = $boutonHTML." disabled";
+            }
+            
+            $boutonHTML = $boutonHTML.">".ucfirst($drink)." <br>";
+            echo $boutonHTML;
+        }
+
+        $maxSucres = min(5, getStock('sucre'));
+        ?>
+            
             <label for="sucres">Nombre de sucres : </label>
             <br>
-            <input type="number" name="sucres" value = 0 >
+            <input type="number" name="sucres" value = 0 min = 0 max = <?php echo $maxSucres?>>
             <input id="monnaie" type="hidden" name="monnaie" value="<?php echo $_SESSION['monnaie']; ?>">
             <input type="submit" value="Commander !"></input>
         </form>
