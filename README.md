@@ -1,0 +1,1 @@
+Pensez bien à créer un fichier config.json (en copiant/renommant config.sample.json) en y entrant les noms de la base de données, de l'utilisateur et son password. le fichier config.json sera iignorer par git par sécurité (ne pas avoir d'identifiant en public sur gitHub)

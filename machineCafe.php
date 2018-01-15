@@ -2,7 +2,38 @@
 
 session_start();
 
+require('fonctions.php');
+require_once('databaseFunctions.php');
+
+$boissonsDisponibles = getAvailableDrinks();
+$prixDesBoissons = [];
+$listeBoisson = getDrinkList();
+foreach($listeBoisson as $boisson){
+    
+    $prixDesBoissons[$boisson] =  getDrinkPrice($boisson);
+}
+
+$date = date("D j M H:i:s");
+$cafe = "Café";
+$cappuccino = "Cappuccino";
+$chocolat = "Chocolat";
+$the = "Thé";
+$statut = "En attente";
+$maxSucres = min(5, getStock('sucre'));
+
+if (isset($_POST['monnaie'])){
+    $_SESSION['monnaie'] = $_POST['monnaie'];
+
+} else {
+    $_SESSION['monnaie'] = 0;
+}
+
+if (isset($_POST['boisson'])){
+
+    $output = preparerBoisson($_POST['boisson'],$_POST['sucres']);
+}
 ?>
+
 <html>
     <head>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -11,55 +42,33 @@ session_start();
     </head>
     <body>
         
-        <?php
+        <?php if(count($boissonsDisponibles) != 0): ?>
+            Liste des boissons disponibles
+            <ul>
 
-        include('fonctions.php');
-        include_once('databaseFunctions.php');
-
-        $boissonsDisponibles = getAvailableDrinks();
-
-        $date = date("D j M H:i:s");
-        $cafe = "Café";
-        $cappuccino = "Cappuccino";
-        $chocolat = "Chocolat";
-        $the = "Thé";
-        $statut = "En attente";
-        
-        if (isset($_POST['monnaie'])){
-            $_SESSION['monnaie'] = $_POST['monnaie'];
-
-        } else {
-            $_SESSION['monnaie'] = 0;
-        }
-
-        if (isset($_POST['boisson'])){
-
-            $output = preparerBoisson($_POST['boisson'],$_POST['sucres']);
-        }
-
-        if(count($boissonsDisponibles) != 0){
-            echo("Liste des boissons disponibles <ul>");
-
-            foreach($boissonsDisponibles as $boisson){
+            <?php foreach($boissonsDisponibles as $boisson): ?>
     
-                echo "<li>".ucfirst($boisson)."</li>";
-            }
-            echo ("</ul>");
-        } else {
-            echo "Aucune boisson disponible";
-        }
-        echo("<p id='monnaieIntroduite'> Crédit : ". $_SESSION['monnaie']." € </p>");
+                <li><?php echo ucfirst($boisson) ?></li>
 
-        echo ("<p> {$statut} </p>");
-        if (isset($output)){
-            echo ("<p> {$output} </p>");
-        }
+            <?php endforeach; ?>
 
-        print("<p> Date du serveur : ".$date."</p>");
+            </ul>
+            <?php else: ?>
+            Aucune boisson disponible
 
-        
+        <?php endif; ?>
 
-        ?>
+        <p id='monnaieIntroduite'> Crédit : <?php echo ($_SESSION['monnaie']/100) ?> € </p>
+
+        <p> <?php echo $statut ?> </p>
+
+        <?php if (isset($output)): ?>
+
+            <p> <?php echo $output ?> </p>
+
+        <?php endif; ?>
+
+        <p> Date du serveur : <?php echo $date ?> </p>
 
         <div id="pieces">
             <img id="btn5cts" src="images/5_cents.png">
@@ -72,21 +81,22 @@ session_start();
 
         <form action="machineCafe.php" method="POST">
             <p><label for="boisson"> Boisson : </label><br>
-        <?php
 
-        foreach(getDrinkList() as $drink){
-            $boutonHTML = "<input type='radio' name='boisson' value='$drink'";
+            <?php foreach(getDrinkList() as $drink): ?>
+
+            <input type='radio' name='boisson' value='<?php echo $drink; ?>'
+
+            <?php
             
             if (!in_array($drink,$boissonsDisponibles)){
-                $boutonHTML = $boutonHTML." disabled";
+                echo " disabled";
             }
             
-            $boutonHTML = $boutonHTML.">".ucfirst($drink)." <br>";
-            echo $boutonHTML;
-        }
-
-        $maxSucres = min(5, getStock('sucre'));
-        ?>
+            ?> > <?php echo ucfirst($drink) ?>
+            </input>
+            <br>
+            
+        <?php endforeach; ?>
             
             <label for="sucres">Nombre de sucres : </label>
             <br>

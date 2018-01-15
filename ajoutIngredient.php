@@ -1,7 +1,7 @@
 <?php
 
     session_start();
-    include_once('databaseFunctions.php');
+    require_once('databaseFunctions.php');
     
     if (isset($_POST['ingredient'])){
         $ingredient = $_POST['ingredient'];
@@ -10,29 +10,31 @@
         addToStock($quantite,$ingredient);
     }
 
+    $ingredientList = getIngredientList();
+
 ?>
-
-
 <!DOCTYPE html>
 
 <html>
 
     <body>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ingrédient</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($ingredientList as $ingredient): ?>
+                <tr>
+                    <td><?php echo $ingredient; ?></td>
+                    <td><?php echo getStock($ingredient); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
 
-    <?php
-
-            $tableau = "<table><thead><th>Ingrédient</th><th>Stock</th></thead><tbody>";
-            $ingredientList = getIngredientList();
-
-            foreach ($ingredientList as $value){
-               $tableau = $tableau."<tr><td>".$value."</td><td>".getStock($value)."</td></tr>";
-            }
-
-            $tableau = $tableau."</tbody></table>";
-
-            echo $tableau;
-
-    ?>
         <form action="ajoutIngredient.php" method="POST">
             <label for="ingredient"> Ingrédient</label>
             <select name="ingredient" id="ingredient">

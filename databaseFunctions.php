@@ -4,7 +4,7 @@ $identification = json_decode(file_get_contents('config.json'));
 
 try
 {
-    $DATABASE = new PDO('mysql:host=localhost;dbname=machinecafe;charset=utf8',$identification->username, $identification->password);
+    $DATABASE = new PDO('mysql:host=localhost;dbname='.$identification->database.';charset=utf8',$identification->username, $identification->password);
 
 }
 catch (Exception $e)
@@ -130,4 +130,30 @@ function getAvailableDrinks(){
     return $availableDrinks;
 }
 
+function getMoneyTable(){
+    global $DATABASE;
+    $moneyTable = [];
+    $query = "SELECT value, stock
+                FROM stockmonnaie
+                ORDER BY value DESC";
+    
+    $reponse = $DATABASE->query($query);
+    while($donnees = $reponse->fetch()){
+
+        $moneyTable[$donnees['value']] = intval($donnees['stock']);
+
+    }
+
+    return $moneyTable;
+}
+
+function setMoneyStock($valeurFaciale, $newStock){
+    global $DATABASE;
+
+    $query = $DATABASE->prepare("UPDATE stockmonnaie
+                                    SET stockmonnaie.stock = :newStock
+                                    WHERE stockmonnaie.value = :value");
+    
+    $query->execute(array("newStock" => $newStock, "value" => $valeurFaciale));
+}
     ?>
